@@ -1,0 +1,16 @@
+pandas
+numpy
+#matplotlib
+#seaborn
+scikit-learn
+#pandas-profiling
+mlflow
+#lightgbm
+fastapi
+uvicorn
+pydantic
+python-dotenv
+joblib
+requests
+great-expectations
+pytest
