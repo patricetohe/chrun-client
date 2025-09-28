@@ -1,0 +1,58 @@
+# === Python général ===
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.venv
+venv/
+env/
+*.egg
+*.log
+
+# === Notebooks Jupyter ===
+.ipynb_checkpoints/
+*.ipynb_convert
+
+# === Données ===
+# data/raw/
+# data/interim/
+# data/processed/
+# data/external/
+
+
+# !data/raw/README.md
+
+# === MLflow ===
+mlruns/
+artifacts/
+
+# === Modèles sauvegardés ===
+models/
+*.joblib
+*.pkl
+*.pickle
+
+# === Résultats temporaires ===
+tmp/
+temp/
+cache/
+*.cache
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === Logs & rapports ===
+logs/
+report/
+*.out
+*.txt
+
+# === Exportations ===
+exports/
+outputs/
+figures/
