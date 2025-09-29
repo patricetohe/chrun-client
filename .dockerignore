@@ -1,0 +1,15 @@
+__pycache__/
+.venv/
+*.pyc
+*.pyo
+.git
+.gitignore
+mlruns/
+notebooks/
+data/raw/
+data/external/
+data/precessed/
+artifacts/model/*.pkl
+artifacts/**/metadata/
+**/.ipynb_checkpoints/
+

@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/User/Documents/PATRICE/github%20projects/churn-client/churn-ml/mlruns/285118374405653173/d9263017b67a4934b757b80738b10890/artifacts
+end_time: 1759173802029
+entry_point_name: ''
+experiment_id: '285118374405653173'
+lifecycle_stage: active
+run_id: d9263017b67a4934b757b80738b10890
+run_name: baseline_xgb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759173780689
+status: 3
+tags: []
+user_id: Patrice TOHE

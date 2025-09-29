@@ -21,30 +21,46 @@ def _map_binary_series(s: pd.Series) -> pd.Series:
     return s
 
 
-def build_features(df: pd.DataFrame, target_col: str = "Churn") -> pd.DataFrame:
+def build_features(df: pd.DataFrame, target_col: str = "Churn", serving: bool = False) -> pd.DataFrame:
     """
-    Pipeline de feature engineering pour l'entraînement.
+    Pipeline de feature engineering pour l'entraînement et le serving.
+
+    - en mode serving=True, on tente l'encodage binaire pour TOUTES les colonnes object
+      connues (Yes/No, Male/Female), même si nunique == 1, afin d'éviter de
+      laisser des dtypes object passer au modèle.
     """
     df = df.copy()
 
+    # Colonnes object hors cible
     obj_cols = [c for c in df.select_dtypes(include=["object"]).columns if c != target_col]
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns.tolist()
 
-    binary_cols = [c for c in obj_cols if df[c].dropna().nunique() == 2]
-    multi_cols = [c for c in obj_cols if df[c].dropna().nunique() > 2]
+    # Encodage binaire
+    if serving:
+        # Essayer d'encoder toutes les colonnes object connues
+        for c in obj_cols:
+            mapped = _map_binary_series(df[c].astype(str))
+            # Si mapping a produit une série entière nullable, on remplace
+            if mapped.dtype.name == "Int64" or pd.api.types.is_integer_dtype(mapped):
+                df[c] = mapped
+    else:
+        # Entraînement: basé sur la cardinalité
+        binary_cols = [c for c in obj_cols if df[c].dropna().nunique() == 2]
+        for c in binary_cols:
+            df[c] = _map_binary_series(df[c].astype(str))
 
-    for c in binary_cols:
-        df[c] = _map_binary_series(df[c].astype(str))
-
+    # Colonnes bool -> int
     bool_cols = df.select_dtypes(include=["bool"]).columns.tolist()
     if bool_cols:
         df[bool_cols] = df[bool_cols].astype(int)
 
-    if multi_cols:
-        df = pd.get_dummies(df, columns=multi_cols, drop_first=True)
+    # Après encodage binaire, one-hot pour le reste des colonnes object
+    remaining_obj = [c for c in df.select_dtypes(include=["object"]).columns if c != target_col]
+    if remaining_obj:
+        df = pd.get_dummies(df, columns=remaining_obj, drop_first=True)
 
-    for c in binary_cols:
-        if pd.api.types.is_integer_dtype(df[c]):
+    # Convertir les Int64 (nullable) en int
+    for c in df.columns:
+        if str(df[c].dtype) == "Int64":
             df[c] = df[c].fillna(0).astype(int)
 
     return df
