@@ -1,23 +1,4 @@
-# name: Docker Image CI
-
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-
-# jobs:
-
-#   build:
-
-#     runs-on: ubuntu-latest
-
-#     steps:
-#     - uses: actions/checkout@v4
-#     - name: Build the Docker image
-#       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-
-name: Build and Push to Docker Hub
+name: Build and Push to Docker Hub (CI)
 
 on:
   push:
@@ -44,6 +25,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile  # change if your Dockerfile has a different name or path
+          file: Dockerfile
           push: true
           tags: patriceth/churn-ml-api:latest
+          # tags: patriceth/churn-ml-api:$(date +%s)
