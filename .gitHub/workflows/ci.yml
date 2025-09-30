@@ -11,23 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
+      working-directory: churn-ml
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
-    - name: Run tests (if any)
-      run: |
-        # python -m pytest tests/ || echo "No tests found"
-        echo "Tests placeholder"
-    
+
     - name: Lint code
+      working-directory: churn-ml
       run: |
         pip install flake8
         flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -36,19 +33,19 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
+
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -58,27 +55,14 @@ jobs:
           type=ref,event=branch
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
-    
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: .
-        file: ../Dockerfile
+        context: churn-ml
+        file: churn-ml/Dockerfile
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Deploy notification
-      run: |
-        echo "🚀 Deployment ready!"
-        echo "Image: ${{ secrets.DOCKERHUB_USERNAME }}/churn-ml-api:latest"
-        echo "To deploy manually:"
-        echo "docker run -p 8000:8000 ${{ secrets.DOCKERHUB_USERNAME }}/churn-ml-api:latest"
